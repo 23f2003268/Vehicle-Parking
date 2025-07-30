@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Parking Spot - Vehicle Parking App{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="fas fa-bookmark me-2"></i>Book Parking Spot</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" novalidate>
+                        <div class="mb-3">
+                            <label class="form-label">Spot ID</label>
+                            <input type="text" class="form-control" value="{{ spot.id }}" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Lot ID</label>
+                            <input type="text" class="form-control" value="{{ lot.id }}" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">User ID</label>
+                            <input type="text" class="form-control" value="{{ current_user.id }}" readonly>
+                        </div>
+                        <div class="mb-4">
+                            <label for="vehicle_no" class="form-label">Vehicle Number *</label>
+                            <input type="text" class="form-control" id="vehicle_no" name="vehicle_no" value="{{ vehicle_no }}" required minlength="4" maxlength="20">
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success"><i class="fas fa-check me-2"></i>Reserve</button>
+                            <a href="{{ url_for('user.dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Parking Lot - Admin{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-plus me-2"></i>Create New Parking Lot
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" novalidate>
+                    <div class="mb-3">
+                        <label for="prime_location_name" class="form-label">
+                            <i class="fas fa-building me-1"></i>Location Name *
+                        </label>
+                        <input type="text" class="form-control" id="prime_location_name" 
+                               name="prime_location_name" required minlength="3" maxlength="120">
+                        <div class="form-text">Enter a unique name for the parking location (e.g., "Central Mall Parking")</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="address" class="form-label">
+                            <i class="fas fa-map-marker-alt me-1"></i>Address *
+                        </label>
+                        <textarea class="form-control" id="address" name="address" 
+                                  rows="3" required minlength="10" maxlength="200"></textarea>
+                        <div class="form-text">Enter the complete address of the parking location</div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="pincode" class="form-label">
+                                    <i class="fas fa-mail-bulk me-1"></i>Pincode *
+                                </label>
+                                <input type="text" class="form-control" id="pincode" 
+                                       name="pincode" required pattern="\d{6}" maxlength="6">
+                                <div class="form-text">6-digit postal code</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="price_per_hour" class="form-label">
+                                    <i class="fas fa-rupee-sign me-1"></i>Price per Hour (₹) *
+                                </label>
+                                <input type="number" class="form-control" id="price_per_hour" 
+                                       name="price_per_hour" required min="1" step="0.01">
+                                <div class="form-text">Hourly parking rate</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="maximum_number_of_spots" class="form-label">
+                            <i class="fas fa-parking me-1"></i>Maximum Number of Spots *
+                        </label>
+                        <input type="number" class="form-control" id="maximum_number_of_spots" 
+                               name="maximum_number_of_spots" required min="1" max="100">
+                        <div class="form-text">Number of parking spots to create (1-100)</div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-plus me-2"></i>Create Parking Lot
+                        </button>
+                        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Information Card -->
+        <div class="card mt-3">
+            <div class="card-header bg-info text-white">
+                <h6 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Information
+                </h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li><i class="fas fa-check text-success me-2"></i>Parking spots will be automatically generated</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Spot numbers will follow pattern: A1, A2, B1, B2, etc.</li>
+                    <li><i class="fas fa-check text-success me-2"></i>All spots will be initially set as available</li>
+                    <li><i class="fas fa-check text-success me-2"></i>You can edit lot details later</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

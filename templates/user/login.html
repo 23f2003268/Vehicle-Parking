@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Vehicle Parking App{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white text-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-sign-in-alt me-2"></i>Login
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" novalidate>
+                    <div class="mb-3">
+                        <label for="username" class="form-label">
+                            <i class="fas fa-user me-1"></i>Username
+                        </label>
+                        <input type="text" class="form-control" id="username" name="username" 
+                               required minlength="3" autocomplete="username">
+                        <div class="form-text">Enter your username</div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="password" class="form-label">
+                            <i class="fas fa-lock me-1"></i>Password
+                        </label>
+                        <input type="password" class="form-control" id="password" name="password" 
+                               required minlength="5" autocomplete="current-password">
+                        <div class="form-text">Enter your password</div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-sign-in-alt me-2"></i>Login
+                    </button>
+                </form>
+                
+                <hr class="my-4">
+                
+                <div class="text-center">
+                    <p class="text-muted mb-2">Don't have an account?</p>
+                    <a href="{{ url_for('user.register') }}" class="btn btn-outline-success btn-sm">
+                        <i class="fas fa-user-plus me-1"></i>Register
+                    </a>
+                </div>
+                <div class="text-center mt-3">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Admins and users log in here.<br>
+                        Demo users: user1,user2, user3, user4, user5 (password: password123)<br>
+                        Admin: admin (password: admin123)
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
