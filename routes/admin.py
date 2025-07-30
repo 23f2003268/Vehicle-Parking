@@ -367,3 +367,45 @@ def search_spots():
             search_results = spots
     
     return render_template('admin/search.html', search_results=search_results)
+
+
+
+
+#admin logout
+@admin_bp.route('/logout')
+@login_required
+def logout():
+    #directly logout
+    logout_user()
+    flash('You have been logged out successfully.', 'info')
+    return redirect(url_for('admin.login'))
+
+
+#summary(the stats required by the admin)
+@admin_bp.route('/summary')
+@login_required
+def summary():
+    if not current_user.is_admin:
+        flash('Access denied.', 'danger')
+        return redirect(url_for('user.dashboard'))
+    lots = ParkingLot.query.all()
+    #revenue generated per lot
+    lot_names = []
+    lot_revenues = []
+    available_counts = []
+    occupied_counts = []
+    for lot in lots:
+        lot_names.append(lot.prime_location_name)
+        #sum total_cost for all the spots in the lots
+        reservations = Reservation.query.join(ParkingSpot).filter(ParkingSpot.lot_id == lot.id, Reservation.leaving_timestamp != None).all()
+        revenue = sum(res.total_cost or 0 for res in reservations)
+        lot_revenues.append(revenue)
+
+        #availability count
+        available_counts.append(lot.get_available_spots_count())
+        occupied_counts.append(lot.get_occupied_spots_count())
+    return render_template('admin/summary.html',
+                           lot_names=lot_names,
+                           lot_revenues=lot_revenues,
+                           available_counts=available_counts,
+                           occupied_counts=occupied_counts)
