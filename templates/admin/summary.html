@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Summary - Vehicle Parking App{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1">
+            <i class="fas fa-chart-pie me-2"></i>Summary & Analytics
+        </h2>
+        <p class="text-muted mb-0">Overview of revenue and lot status</p>
+    </div>
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+    </a>
+</div>
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-rupee-sign me-2"></i>Revenue from Each Parking Lot</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="revenueChart" height="220"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Available & Occupied Spots per Lot</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="statusChart" height="220"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Revenue Doughnut Chart
+const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+new Chart(revenueCtx, {
+    type: 'doughnut',
+    data: {
+        labels: {{ lot_names|tojson }},
+        datasets: [{
+            data: {{ lot_revenues|tojson }},
+            backgroundColor: [
+                '#0d6efd', '#198754', '#ffc107', '#dc3545', '#20c997', '#6f42c1', '#fd7e14', '#0dcaf0'
+            ],
+            borderWidth: 2,
+            borderColor: '#fff'
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { position: 'bottom' },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return context.label + ': ₹' + context.parsed;
+                    }
+                }
+            }
+        }
+    }
+});
+
+// Bar Chart for Available & Occupied Spots
+const statusCtx = document.getElementById('statusChart').getContext('2d');
+new Chart(statusCtx, {
+    type: 'bar',
+    data: {
+        labels: {{ lot_names|tojson }},
+        datasets: [
+            {
+                label: 'Available',
+                data: {{ available_counts|tojson }},
+                backgroundColor: '#198754'
+            },
+            {
+                label: 'Occupied',
+                data: {{ occupied_counts|tojson }},
+                backgroundColor: '#dc3545'
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { position: 'top' },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return context.dataset.label + ': ' + context.parsed.y;
+                    }
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                precision: 0
+            }
+        }
+    }
+});
+</script>
+{% endblock %} 

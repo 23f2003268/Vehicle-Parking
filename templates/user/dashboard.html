@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block title %}User Dashboard - Vehicle Parking App{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Welcome and Navigation -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">
+                <i class="fas fa-home me-2"></i>Welcome, {{ current_user.username }}!
+            </h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Recent Parking History -->
+        <div class="col-lg-7 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Parking History</h5>
+                </div>
+                <div class="card-body">
+                    {% if history %}
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Location</th>
+                                    <th>Vehicle No</th>
+                                    <th>Timestamp</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for res in history %}
+                                <tr>
+                                    <td>#{{ res.id }}</td>
+                                    <td>
+                                        {% if res.spot and res.spot.lot %}
+                                            {{ res.spot.lot.prime_location_name }}<br>
+                                            <small class="text-muted">{{ res.spot.lot.address }}</small>
+                                        {% else %}
+                                            <span class="text-danger">[Lot Deleted]</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ res.vehicle_no if res.vehicle_no else '-' }}</td>
+                                    <td>
+                                        <small>{{ res.parking_timestamp.strftime('%Y-%m-%d %H:%M') }}</small>
+                                    </td>
+                                    <td>
+                                        {% if not res.leaving_timestamp %}
+                                            <form method="POST" action="{{ url_for('user.release_spot', reservation_id=res.id) }}" style="display:inline;">
+                                                <button type="submit" class="btn btn-warning btn-sm">
+                                                    <i class="fas fa-sign-out-alt me-1"></i>Release
+                                                </button>
+                                            </form>
+                                        {% else %}
+                                            <span class="badge bg-success"><i class="fas fa-check me-1"></i>Released</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-inbox fa-2x mb-2"></i><br>
+                            No recent parking history.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <!-- Search Parking Lots -->
+        <div class="col-lg-5 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-search me-2"></i>Search Parking Lots</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" class="mb-3">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="search" placeholder="Location or Pin Code" value="{{ search_query }}">
+                            <button class="btn btn-info" type="submit"><i class="fas fa-search"></i> Search</button>
+                        </div>
+                    </form>
+                    {% if lots %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Address</th>
+                                    <th>Availability</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for lot in lots %}
+                                <tr>
+                                    <td>{{ lot.id }}</td>
+                                    <td>
+                                        <strong>{{ lot.prime_location_name }}</strong><br>
+                                        <small class="text-muted">{{ lot.address }}</small><br>
+                                        <span class="badge bg-secondary">{{ lot.pincode }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success">{{ lot.get_available_spots_count() }}</span> /
+                                        <span class="badge bg-danger">{{ lot.maximum_number_of_spots }}</span>
+                                    </td>
+                                    <td>
+                                        {% if lot.get_available_spots_count() > 0 %}
+                                            <a href="{{ url_for('user.book', lot_id=lot.id) }}" class="btn btn-success btn-sm">Book</a>
+                                        {% else %}
+                                            <button class="btn btn-secondary btn-sm" disabled>No Spots</button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% elif search_query %}
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-search fa-2x mb-2"></i><br>
+                            No lots found for your search.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
