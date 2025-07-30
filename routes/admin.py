@@ -333,3 +333,37 @@ def view_spots(lot_id):
                          lot=lot, 
                          spots=spots,
                          occupied_spots=occupied_spots)
+
+
+
+#searching spots
+@admin_bp.route('/search', methods=['GET', 'POST'])
+@login_required
+def search_spots():
+    #check for admin
+    if not current_user.is_admin:
+        flash('Access denied. Admin privileges required.', 'danger')
+        return redirect(url_for('user.dashboard'))
+
+    #seaching according to filters given
+    search_results = []
+    if request.method == 'POST':
+        search_term = request.form.get('search_term', '').strip()
+        search_type = request.form.get('search_type', 'spot_number')
+        
+        if search_term:
+            if search_type == 'spot_number':
+                spots = ParkingSpot.query.filter(ParkingSpot.spot_number.contains(search_term)).all()
+            elif search_type == 'lot_name':
+                lots = ParkingLot.query.filter(ParkingLot.prime_location_name.contains(search_term)).all()
+                spots = []
+                for lot in lots:
+                    spots.extend(lot.spots)
+            else:  #status
+                status = 'O' if search_term.lower() in ['occupied', 'o'] else 'A'
+                spots = ParkingSpot.query.filter_by(status=status).all()
+            
+            #spots stored in search_results
+            search_results = spots
+    
+    return render_template('admin/search.html', search_results=search_results)
