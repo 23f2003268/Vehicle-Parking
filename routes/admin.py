@@ -265,3 +265,71 @@ def delete_lot(lot_id):
         flash('Error deleting parking lot. Please try again.', 'danger')
     
     return redirect(url_for('admin.dashboard'))
+
+
+
+
+#viewing user and their reservation
+@admin_bp.route('/users')
+@login_required
+def view_users():
+    #check for admin
+    if not current_user.is_admin:
+        flash('Access denied. Admin privileges required.', 'danger')
+        return redirect(url_for('user.dashboard'))
+
+    #all users (not admin)
+    users = User.query.filter_by(is_admin=False).order_by(User.created_at.desc()).all()
+    
+    # calculating stats
+    total_reservations = sum(len(user.reservations) for user in users)
+    active_users = len([user for user in users if user.reservations])
+    total_revenue = sum(
+        sum(res.total_cost for res in user.reservations if res.total_cost)
+        for user in users
+    )
+    
+    # get all the reservation sorted by date
+    all_reservations = []
+    for user in users:
+        all_reservations.extend(user.reservations)
+    
+    # now get only the recent 5 only for presenting
+    recent_reservations = sorted(all_reservations, key=lambda x: x.created_at, reverse=True)[:5]
+    
+    return render_template('admin/users.html', 
+                         users=users,
+                         total_reservations=total_reservations,
+                         active_users=active_users,
+                         total_revenue=total_revenue,
+                         recent_reservations=recent_reservations)
+
+
+#viewing spots of a lot
+@admin_bp.route('/lots/<int:lot_id>/spots')
+@login_required
+def view_spots(lot_id):
+    #check for admin
+    if not current_user.is_admin:
+        flash('Access denied. Admin privileges required.', 'danger')
+        return redirect(url_for('user.dashboard'))
+
+    lot = ParkingLot.query.get_or_404(lot_id)
+    spots = ParkingSpot.query.filter_by(lot_id=lot.id).order_by(ParkingSpot.spot_number).all()
+    
+    # current reservation of occupied spots
+    occupied_spots = {}
+    for spot in spots:
+        if spot.status == 'O':
+            #query conditions
+            active_reservation = Reservation.query.filter_by(
+                spot_id=spot.id, 
+                leaving_timestamp=None
+            ).first()
+            if active_reservation:
+                occupied_spots[spot.id] = active_reservation
+    
+    return render_template('admin/lot_spots.html', 
+                         lot=lot, 
+                         spots=spots,
+                         occupied_spots=occupied_spots)
